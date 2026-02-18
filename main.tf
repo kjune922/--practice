@@ -16,8 +16,17 @@ module "ec2" {
   subnet_id = module.vpc.public_subnet_ids[0]
   instance_type = "t2.micro"
   ubuntu_ami = "ami-0dec6548c7c0d0a96"
+  rds_address = module.rds.rds_instance_address
 }
 
+# 3. rds모듈호출
 
-
+module "rds" {
+  source = "./modules/rds"
+  vpc_id = module.vpc.vpc_id
+  db_username = "test"
+  db_password = "dlrudalswns2!"
+  private_subnet_ids = [module.vpc.private_subnet_ids[0],module.vpc.private_subnet_ids[1]]
+  test_security_id = module.ec2.test_sg_id
+}
 

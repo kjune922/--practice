@@ -9,7 +9,7 @@ resource "aws_instance" "test_app" {
   associate_public_ip_address = true
 
   user_data_replace_on_change = true
-  user_data = templatefile("${path.module}/userdata.sh",{})
+  user_data = templatefile("${path.module}/userdata.sh",{db_endpoint = var.rds_address})
 
   tags = {
   Name = "test-ec2"

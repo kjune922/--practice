@@ -8,3 +8,7 @@ output "instance_state" {
   value = aws_instance.test_app.instance_state
 }
 
+output "test_sg_id" {
+  value = aws_security_group.test_sg.id
+}
+

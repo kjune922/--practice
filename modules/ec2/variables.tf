@@ -11,3 +11,8 @@ variable "instance_type" {
 variable "ubuntu_ami" {
   type = string
 }
+
+variable "rds_address" {
+  type = string
+}
+
