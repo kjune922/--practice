@@ -24,14 +24,14 @@ resource "aws_security_group" "test_sg"{
   from_port = 80
   to_port = 80
   protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  security_groups = [var.test_alb_sg_id] # 이제 모든 주소범위는 보안그룹id로 바뀌면서, alb한테 받아함야
   }
 
   ingress {
   from_port = 22
   to_port = 22
   protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["0.0.0.0/0"] # 내가 직접 접속하는 ssh니까 이건 고
   }
 
   egress {
@@ -45,17 +45,6 @@ resource "aws_security_group" "test_sg"{
   Name = "test-sg"
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

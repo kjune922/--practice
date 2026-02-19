@@ -16,3 +16,7 @@ variable "rds_address" {
   type = string
 }
 
+variable "test_alb_sg_id" {
+  type = string
+}
+
