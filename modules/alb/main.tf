@@ -65,11 +65,6 @@ resource "aws_security_group" "test_alb_sg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "test_attach" {
-  target_group_arn = aws_lb_target_group.test_target.arn
-  target_id = var.instance_id
-  port = 80
-}
 
 
 
