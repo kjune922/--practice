@@ -2,6 +2,18 @@ provider "aws" {
   region = "ap-northeast-2"
 }
 
+# s3와 DynamoDB 백엔드 설정
+terraform {
+  backend "s3" {
+    bucket = "kjune922-terraform-state"
+    key = "terraform.tfstate"
+    region = "ap-northeast-2"
+    dynamodb_table = "terraform-lock"
+    encrypt = true
+  }
+}
+
+
 # 1. vpc모듈호출
 
 module "vpc" {
