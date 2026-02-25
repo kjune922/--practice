@@ -7,52 +7,47 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform Apply"
+    name: "Terraform and Docker Deploy"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      # 1. AWS 자격 증명 설정 (이 단계 하나로 모든 env 설정을 대신합니다)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
         run: terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "ap-northeast-2"
 
       - name: Terraform Plan
         run: terraform plan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "ap-northeast-2"
 
       - name: Terraform Apply
-        run : terraform apply -auto-approve
-        env :
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "ap-northeast-2"
+        run: terraform apply -auto-approve
 
-     - name: Login to Amazon ECR
-       id: login-ecr
-       uses: aws-actions/amazon-ecr-login@v1
+      # 2. ECR 로그인 (오타 수정됨)
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      # 3. Docker 빌드 및 푸시
-     - name: Build, tag, and push image to Amazon ECR
-       env:
-         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-         ECR_REPOSITORY: kjune-test-app-repo 
-         IMAGE_TAG: ${{ github.sha }}
-       run: |
-      # app 폴더로 이동해서 빌드
-         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
-         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./app
+      # 3. Docker 빌드 및 ECR 푸시 (경로와 이름표 확인 완료)
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: kjune-test-app-repo
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./app
           
-      # ECR로 푸시
-         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
