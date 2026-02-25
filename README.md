@@ -7,7 +7,7 @@
 핵심 성과: 1분 20초 이내에 전체 인프라 리소스 배포 및 애플리케이션 업데이트 완료.
 
 2. 시스템 아키텍처
-이미지 폴더첨부
+![Architecture Diagram](./images/IaC-AWS.png)
 
 3. 주요 구현 특징
 Infrastructure as Code (IaC): Terraform을 사용하여 VPC, Subnet, ALB, EC2, RDS, S3(Remote Backend)를 코드로 관리.
