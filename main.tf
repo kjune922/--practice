@@ -13,6 +13,17 @@ terraform {
   }
 }
 
+# ECR (Elastic Container Registry) 생성
+resource "aws_ecr_repository" "test_app_repo" {
+  name = "kjune-test-app-repo"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true # 이미지를 올릴때마다 보안 취약점을 검사하는 코드임
+  }
+}
+
+
+
 
 # 1. vpc모듈호출
 
