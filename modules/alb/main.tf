@@ -1,5 +1,5 @@
 resource "aws_lb" "test_alb" {
-  name = "test-alb"
+  name = "test-alb-${terraform.workspace}"
   internal = false # 외부 노출용이라는 뜻
   load_balancer_type = "application"
   security_groups = [aws_security_group.test_alb_sg.id]
@@ -13,7 +13,7 @@ resource "aws_lb" "test_alb" {
 # 2. 대상 그룹(Target_group)
 
 resource "aws_lb_target_group" "test_target" {
-  name = "test-target-group"
+  name = "test-target-group-${terraform.workspace}"
   port = 80
   protocol = "HTTP"
   vpc_id = var.vpc_id
@@ -42,7 +42,7 @@ resource "aws_lb_listener" "test_listener" {
 
 
 resource "aws_security_group" "test_alb_sg" {
-  name = "test-alb-sg"
+  name = "test-alb-sg-${terraform.workspace}"
   vpc_id = var.vpc_id
 
   # 인바운드 -> 전세계에서 포트80으로 들어오는거 허용

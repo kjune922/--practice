@@ -17,7 +17,7 @@ terraform {
 
 # ECR (Elastic Container Registry) 생성
 resource "aws_ecr_repository" "test_app_repo" {
-  name = "kjune-test-app-repo"
+  name = "kjune-test-app-repo-${terraform.workspace}"
   image_tag_mutability = "MUTABLE"
   force_delete = true
   image_scanning_configuration {

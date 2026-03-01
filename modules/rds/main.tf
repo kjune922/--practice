@@ -1,5 +1,5 @@
 resource "aws_security_group" "test_rds_sg" {
-  name = "test-rds-sg"
+  name = "test-rds-sg-${terraform.workspace}"
   vpc_id = var.vpc_id
   tags = {
   Name = "test-rds-sg"
@@ -41,7 +41,7 @@ resource "aws_db_instance" "test_main" {
 }
 
 resource "aws_db_subnet_group" "test_db_subnet_group" {
-  name = "test-db-subnet-group"
+  name = "test-db-subnet-group-${terraform.workspace}"
   subnet_ids = var.private_subnet_ids
   tags = {
     Name = "test-db-subnet-group"

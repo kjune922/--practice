@@ -7,7 +7,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # 2. Github Actions가 사용할 IAM role 생성
 resource "aws_iam_role" "github_actions_role" {
-  name = "github-actions-terraform-role"
+  name = "github-actions-terraform-role-${terraform.workspace}"
 
   # 이 롤은 내 깃허브 레포지토리에서만 가져갈수있게 제한
   assume_role_policy = jsonencode({
@@ -28,3 +28,10 @@ resource "aws_iam_role" "github_actions_role" {
     ]
   })
 }
+
+# 역할 생성
+resource "aws_iam_role_policy_attachment" "github_admin" {
+  role = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
