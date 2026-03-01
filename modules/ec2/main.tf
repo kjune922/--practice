@@ -16,12 +16,25 @@
 #  }
 #}
 
+# 워크스페이스따른 ec2모델구분
+#resource "aws_instance" "web" {
+#  instance_type = terraform.workspace == "prod" ? "t2.mircro" : "t3.micro"
+#  count = terraform.workspace == "prod" ? 2 : 1
+#  tags = { Name = "kjune922-web-server-${terraform.workspace}"
+#  }
+#}
+
+
+
+
 # 단일ec2대신 런치템플릿선언
 
 resource "aws_launch_template" "test_launch_template" {
-  name_prefix = "test-app-lt"
+  name_prefix = "test-app-lt-${terraform.workspace}"
   image_id = var.ubuntu_ami
-  instance_type = "t3.micro"
+
+  # prod면 t2.micro, 아니면 t3.micro
+  instance_type = terraform.workspace == "prod" ? "t2.mircro" : "t3.micro"
   
   vpc_security_group_ids = [aws_security_group.test_sg.id]
 
@@ -29,7 +42,7 @@ resource "aws_launch_template" "test_launch_template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = { Name = "test-asg-instance" }
+    tags = { Name = "test-asg-instance-${terraform.workspace}" }
   }
 }
 
@@ -37,8 +50,8 @@ resource "aws_launch_template" "test_launch_template" {
 resource "aws_autoscaling_group" "test_asg" {
   vpc_zone_identifier = var.private_subnet_ids
 
-  desired_capacity = 2 #  평소유지할 서버수
-  max_size = 4
+  desired_capacity = terraform.workspace == "prod" ? 2 : 1 #  평소유지할 서버수
+  max_size = terraform.workspace == "prod" ? 4 : 2
   min_size = 1
 
   target_group_arns = [var.target_group_arn]

@@ -8,15 +8,18 @@ terraform {
     bucket = "kjune922-terraform-state"
     key = "terraform.tfstate"
     region = "ap-northeast-2"
-    dynamodb_table = "terraform-lock"
+    dynamodb_table = "terraform-lock-table"
     encrypt = true
   }
 }
+
+
 
 # ECR (Elastic Container Registry) 생성
 resource "aws_ecr_repository" "test_app_repo" {
   name = "kjune-test-app-repo"
   image_tag_mutability = "MUTABLE"
+  force_delete = true
   image_scanning_configuration {
     scan_on_push = true # 이미지를 올릴때마다 보안 취약점을 검사하는 코드임
   }
@@ -37,7 +40,7 @@ module "ec2" {
   source = "./modules/ec2"
   vpc_id = module.vpc.vpc_id
   # subnet_id = module.vpc.public_subnet_ids[0]
-  instance_type = "t2.micro"
+  instance_type = terraform.workspace == "prod" ? "t2.micro" : "t3.micro"
   ubuntu_ami = "ami-0dec6548c7c0d0a96"
   rds_address = module.rds.rds_instance_address
   test_alb_sg_id = module.alb.test_alb_sg_id
