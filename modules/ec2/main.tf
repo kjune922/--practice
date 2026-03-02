@@ -34,11 +34,15 @@ resource "aws_launch_template" "test_launch_template" {
   image_id = var.ubuntu_ami
 
   # prod면 t2.micro, 아니면 t3.micro
-  instance_type = terraform.workspace == "prod" ? "t2.mircro" : "t3.micro"
+  instance_type = terraform.workspace == "prod" ? "t2.micro" : "t3.micro"
   
   vpc_security_group_ids = [aws_security_group.test_sg.id]
 
   user_data = base64encode(templatefile("${path.module}/userdata.sh",{db_endpoint = var.rds_address}))
+   
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_profile.name
+  }
 
   tag_specifications {
     resource_type = "instance"
@@ -80,6 +84,13 @@ resource "aws_security_group" "test_sg"{
   to_port = 22
   protocol = "tcp"
   cidr_blocks = ["0.0.0.0/0"] # 내가 직접 접속하는 ssh니까 이건 고
+  }
+  
+  ingress {
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  self = true
   }
 
   egress {

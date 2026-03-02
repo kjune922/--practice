@@ -7,9 +7,9 @@ echo "Amazon-Linux 2 배포 시작중..."
 
 
 # 1. 패키지 업데이트 및 파이썬 설치
-sudo yum update -y
-sudo yum install -y python3
-sudo yum install -y nginx
+sudo dnf update -y
+sudo dnf install -y python3
+sudo dnf install -y nginx
 
 # 2. 앱 디렉토리 생성 및 이동 (예시)
 APP_DIR="/home/ec2-user/app"

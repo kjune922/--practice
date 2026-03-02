@@ -25,7 +25,43 @@ resource "aws_ecr_repository" "test_app_repo" {
   }
 }
 
+# SSM을 위해 vpc 엔드포인트생성
+# Root의 main.tf 하단에 추가
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id              = module.vpc.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-2.ssm"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.vpc.private_subnet_ids # 리스트 형태이므로 그대로 사용 가능
+  security_group_ids  = [module.ec2.test_sg_id]
+  private_dns_enabled = true
+}
 
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_id              = module.vpc.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-2.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.vpc.private_subnet_ids
+  security_group_ids  = [module.ec2.test_sg_id]
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_id              = module.vpc.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-2.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.vpc.private_subnet_ids
+  security_group_ids  = [module.ec2.test_sg_id]
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "sts" {
+  vpc_id = module.vpc.vpc_id
+  service_name = "com.amazonaws.ap-northeast-2.sts"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = module.vpc.private_subnet_ids
+  security_group_ids = [module.ec2.test_sg_id]
+  private_dns_enabled = true
+}
 
 
 # 1. vpc모듈호출
