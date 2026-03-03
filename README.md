@@ -75,4 +75,26 @@ FastAPI 앱 생성: test_main.py를 작성하고 RDS 연결 테스트 코드를 
 
 Git Push: 성공한 코드를 저장했지만, userdata.sh에 DB 비밀번호가 하드코딩된 채로 올라간 점을 인지했습니다. (추후 Secrets Manager 등으로 개선 필요)
 
-Terraform Destroy: 비용 절감을 위해 NAT Gateway, ALB, RDS 등 모든 자원을 깔끔하게 삭제했습니다.
+Terraform Destroy: 비용 절감을 위해 NAT Gateway, ALB, RDS 등 모든 자원을 깔끔하게 삭제
+
+--------------------------------------------
+2026-03-03
+--------------------------------------------
+
+🚀 Architecture & Features (아키텍처 및 주요 기능)
+
+3-Tier 아키텍처 기반 자동화 배포: ALB - ASG(EC2, Amazon Linux 2023) - RDS(MySQL) 구조를 Terraform으로 코드로 관리(IaC)하여 일관된 인프라 프로비저닝 환경 구축.
+
+보안 및 비용 최적화: 퍼블릭망(SSH, 22번 포트) 접근을 전면 차단하고, NAT Gateway 대신 VPC Endpoint(AWS PrivateLink)를 연동하여 AWS Systems Manager(SSM)를 통한 안전한 프라이빗 원격 접속 구현 및 트래픽 비용 절감.
+
+동적 구성 관리: Terraform의 templatefile을 활용해 RDS 엔드포인트 등의 동적 변수를 EC2의 userdata.sh에 주입하여 하드코딩 방지 및 보안성 강화.
+
+🛠 Troubleshooting & Optimization (문제 해결 및 최적화)
+
+이슈: EC2 프로비저닝 완료 후 ALB DNS 접속 시 Nginx 502 Bad Gateway 에러 발생.
+
+원인 파악: 인프라 네트워크(보안 그룹, 라우팅) 문제가 아님을 인지하고, SSM을 통해 프라이빗 EC2에 직접 접속. /var/log/user-data.log 및 애플리케이션 백그라운드 실행 로그(app.log)를 분석하여 Python 스크립트 내 DB 연결부의 구문/들여쓰기 에러가 원인임을 특정.
+
+해결 및 IaC 동기화: 1. EC2 내부에서 라이브 핫픽스(Hotfix)를 적용하여 DB 연결 및 애플리케이션 정상 동작(방문자 카운터 API) 1차 확인.
+2. 수동으로 수정한 코드를 Terraform userdata.sh에 역으로 동기화(Sync)하고 GitHub Actions를 통해 재배포.
+3. 코드 수정 시 기존 인프라와 상태가 어긋나는 Drift 현상을 방지하기 위해, 불변 인프라(Immutable Infrastructure) 원칙에 따라 ASG 인스턴스를 교체(terraform apply -replace)하여 무결성 확보.
