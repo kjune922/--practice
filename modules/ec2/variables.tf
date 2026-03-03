@@ -8,9 +8,9 @@ variable "vpc_id" {
 variable "instance_type" {
   default = "t2.micro"
 }
-variable "ubuntu_ami" {
-  type = string
-}
+# variable "ubuntu_ami" {
+#  type = string
+# }
 
 variable "rds_address" {
   type = string

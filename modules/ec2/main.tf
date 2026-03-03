@@ -24,21 +24,31 @@
 #  }
 #}
 
+data "aws_ami" "amazon_linux_2023" {
+  most_recent = true
+  owners = ["amazon"]
 
+  filter {
+    name = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+}
 
 
 # 단일ec2대신 런치템플릿선언
 
 resource "aws_launch_template" "test_launch_template" {
   name_prefix = "test-app-lt-${terraform.workspace}"
-  image_id = var.ubuntu_ami
+  image_id = data.aws_ami.amazon_linux_2023.id
 
   # prod면 t2.micro, 아니면 t3.micro
   instance_type = terraform.workspace == "prod" ? "t2.micro" : "t3.micro"
   
   vpc_security_group_ids = [aws_security_group.test_sg.id]
 
-  user_data = base64encode(templatefile("${path.module}/userdata.sh",{db_endpoint = var.rds_address}))
+  user_data = base64encode(templatefile("${path.module}/userdata.sh",{db_endpoint = var.rds_address, 
+  #db_password = var.db_password
+  }))
    
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_profile.name
@@ -79,15 +89,15 @@ resource "aws_security_group" "test_sg"{
   security_groups = [var.test_alb_sg_id] # 이제 모든 주소범위는 보안그룹id로 바뀌면서, alb한테 받아함야
   }
 
-  ingress {
-  from_port = 22
-  to_port = 22
-  protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"] # 내가 직접 접속하는 ssh니까 이건 고
-  }
+#  ingress {
+#  from_port = 22
+#  to_port = 22
+#  protocol = "tcp"
+#  cidr_blocks = ["0.0.0.0/0"] # 내가 직접 접속하는 ssh니까 이건 고
+#  }
   
   ingress {
-  from_port = 443
+  from_port = 44
   to_port = 443
   protocol = "tcp"
   self = true

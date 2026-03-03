@@ -77,7 +77,7 @@ module "ec2" {
   vpc_id = module.vpc.vpc_id
   # subnet_id = module.vpc.public_subnet_ids[0]
   instance_type = terraform.workspace == "prod" ? "t2.micro" : "t3.micro"
-  ubuntu_ami = "ami-0dec6548c7c0d0a96"
+  # ubuntu_ami = "ami-0dec6548c7c0d0a96"
   rds_address = module.rds.rds_instance_address
   test_alb_sg_id = module.alb.test_alb_sg_id
   private_subnet_ids = [module.vpc.private_subnet_ids[0],module.vpc.private_subnet_ids[1]]
