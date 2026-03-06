@@ -6,7 +6,7 @@ variable "vpc_id" {
 #}
 
 variable "instance_type" {
-  default = "t2.micro"
+  type = string
 }
 # variable "ubuntu_ami" {
 #  type = string

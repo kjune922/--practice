@@ -4,6 +4,7 @@ resource "aws_lb" "test_alb" {
   load_balancer_type = "application"
   security_groups = [aws_security_group.test_alb_sg.id]
   subnets = var.public_subnet_ids # ALB는 퍼블릭 서브넷에 있어야함
+  idle_timeout = 300
 
   tags = {
   Name = "test-alb"

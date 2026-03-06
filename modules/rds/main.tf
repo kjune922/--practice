@@ -9,8 +9,8 @@ resource "aws_security_group" "test_rds_sg" {
 
 resource "aws_security_group_rule" "rds_ingress" { 
   type = "ingress"
-  from_port = 3306
-  to_port = 3306
+  from_port = 5432
+  to_port = 5432
   protocol = "tcp"
 
   # cidr_blocks가 아니라 보안그룹 지정
@@ -29,13 +29,15 @@ resource "aws_security_group_rule" "rds_egress"  {
 
 resource "aws_db_instance" "test_main" {
   allocated_storage = 20
-  engine = "mysql"
-  engine_version = "8.0"
+  engine = "postgres"
+  engine_version = "16.8"
   instance_class = "db.t3.micro"
-  db_name = "testdb"
+  db_name = var.db_name
   username = var.db_username
   password = var.db_password
   skip_final_snapshot = true
+  port = 5432
+  multi_az = false # 비용절감용
   db_subnet_group_name = aws_db_subnet_group.test_db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.test_rds_sg.id]
 }

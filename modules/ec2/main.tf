@@ -42,16 +42,25 @@ resource "aws_launch_template" "test_launch_template" {
   image_id = data.aws_ami.amazon_linux_2023.id
 
   # prod면 t2.micro, 아니면 t3.micro
-  instance_type = terraform.workspace == "prod" ? "t2.micro" : "t3.micro"
+  instance_type = var.instance_type
   
   vpc_security_group_ids = [aws_security_group.test_sg.id]
 
-  user_data = base64encode(templatefile("${path.module}/userdata.sh",{db_endpoint = var.rds_address, 
+  user_data = base64encode(templatefile("${path.module}/userdata_ollama.sh",{db_endpoint = var.rds_address, 
   #db_password = var.db_password
   }))
    
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_profile.name
+  }
+
+  # 디스크용량추가
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 30
+      volume_type = "gp3"
+    }
   }
 
   tag_specifications {
@@ -97,7 +106,7 @@ resource "aws_security_group" "test_sg"{
 #  }
   
   ingress {
-  from_port = 44
+  from_port = 443
   to_port = 443
   protocol = "tcp"
   self = true

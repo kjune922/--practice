@@ -1,3 +1,16 @@
+# Nginx 로그 그룹
+resource "aws_cloudwatch_log_group" "nginx_logs" {
+  name = "/aws/ec2/nginx-access-logs"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "fastapi_logs" {
+  name = "/aws/ec2/fastapi-app-logs"
+  retention_in_days = 7
+}
+
+
+
 resource "aws_cloudwatch_dashboard" "main" { 
   dashboard_name = "kjune922-infra-dashboard-${terraform.workspace}"
 
