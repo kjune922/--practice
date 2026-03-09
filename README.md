@@ -202,3 +202,17 @@ SELECT * FROM ai_history;
 
 ![Architecture Diagram](./images/모니터링까지버전.drawio.png)
 
+1. High Availability (Multi-AZ)
+   - Multi-AZ Deployment: 인프라 리소스를 `AZ-A`와 `AZ-B`로 분산 배치하여 특정 가용 영역 장애 시에도 서비스 연속성을 보장합니다.
+   - Auto Scaling Group (ASG): 두 가용 영역을 가로질러 인스턴스를 관리하며, 트래픽 변화에 따라 유연하게 리소스를 확장합니다.
+
+2. 3-Tier AI Serving Stack
+   - Nginx & FastAPI: 리버스 프록시와 API 서버를 통한 안정적인 요청 처리.
+   - TinyLlama : 리소스 제약 환경에 맞춰 모델을 라이트사이징하여 RPS 4.9 및 실패율 0% 달성.
+
+3. Observability & Alerting
+   - Real-time Monitoring: CloudWatch를 통해 인프라 지표와 로그를 중앙 집중형으로 관리합니다.
+   - SNS Alerting System: CPU 부하 등 임계치 초과 시 즉각적으로 이메일 알림을 발송하는 장애 대응 체계를 구축했습니다.
+
+4. CI/CD Pipeline
+   - GitHub Actions & ECR: 코드 업데이트 시 자동으로 이미지를 빌드하고 ECR로 푸시하여 무중단 배포의 기반을 마련했습니다.
